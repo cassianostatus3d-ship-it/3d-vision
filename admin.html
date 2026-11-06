@@ -1,0 +1,117 @@
+
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin | 3D VISION</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#080d18;color:white;font-family:Arial;padding:20px}
+main{max-width:850px;margin:30px auto}
+header{background:#111c2e;padding:22px;border-radius:12px}
+h1 span{color:#43d5ff}
+section{background:#111c2e;padding:22px;margin-top:20px;border-radius:12px}
+input{display:block;width:100%;padding:13px;margin:12px 0;background:#080d18;border:1px solid #30435e;color:white;border-radius:7px}
+button{background:#168cff;color:white;border:0;padding:13px;border-radius:7px;margin:5px;cursor:pointer}
+.item{padding:14px;border-bottom:1px solid #30435e}
+#msg{color:#43d5ff}
+</style>
+</head>
+<body>
+<main>
+<header>
+<h1>3D <span>VISION</span></h1>
+<p>Painel de administração</p>
+</header>
+
+<section>
+<h2>Adicionar produto</h2>
+<form id="productForm">
+<input id="name" placeholder="Nome do produto" required>
+<input id="description" placeholder="Descrição">
+<input id="price" type="number" min="1" placeholder="Preço em Kz" required>
+<input id="image" type="url" placeholder="URL da imagem">
+<input id="stock" type="number" min="0" placeholder="Stock" required>
+<button type="submit">Adicionar produto</button>
+</form>
+<p id="msg"></p>
+</section>
+
+<section>
+<h2>Produtos da loja</h2>
+<div id="products">A carregar...</div>
+</section>
+
+<section>
+<button onclick="logout()">Terminar sessão</button>
+<a href="index.html" style="color:#43d5ff">Voltar à loja</a>
+</section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script>
+async function start(){
+ const {data:{user}}=await supabaseClient.auth.getUser();
+ if(!user){location.href="login.html";return;}
+
+ const {data:profile,error}=await supabaseClient
+ .from("profiles").select("role").eq("id",user.id).single();
+
+ if(error||profile.role!=="admin"){
+ alert("Acesso reservado ao administrador.");
+ location.href="index.html";return;
+ }
+
+ loadProducts();
+}
+
+async function loadProducts(){
+ const {data,error}=await supabaseClient.from("products")
+ .select("*").order("id",{ascending:false});
+
+ const box=document.getElementById("products");
+ if(error){box.textContent=error.message;return;}
+
+ box.innerHTML=data.map(p=>`
+ <div class="item">
+ <strong>${escapeHTML(p.name)}</strong>
+ <p>${Number(p.price).toLocaleString("pt-AO")} Kz | Stock: ${p.stock}</p>
+ </div>`).join("")||"Sem produtos.";
+}
+
+function escapeHTML(s){
+ return String(s??"").replace(/[&<>"']/g,c=>({
+ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+ }[c]));
+}
+
+document.getElementById("productForm").onsubmit=async e=>{
+ e.preventDefault();
+ const msg=document.getElementById("msg");
+ const product={
+ name:document.getElementById("name").value.trim(),
+ description:document.getElementById("description").value,
+ price:Number(document.getElementById("price").value),
+ image:document.getElementById("image").value,
+ stock:Number(document.getElementById("stock").value)
+ };
+
+ const {error}=await supabaseClient.from("products").insert(product);
+ if(error){msg.textContent=error.message;return;}
+
+ msg.textContent="Produto adicionado!";
+ e.target.reset();
+ loadProducts();
+};
+
+async function logout(){
+ await supabaseClient.auth.signOut();
+ location.href="login.html";
+}
+
+start();
+</script>
+</body>
+</html>
