@@ -1,0 +1,99 @@
+
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Criar conta | 3D VISION</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;min-height:100vh;display:flex;justify-content:center;
+ align-items:center;background:#080d18;color:white;
+ font-family:Arial,sans-serif;padding:20px
+}
+.card{
+ width:100%;max-width:440px;background:#111c2e;
+ padding:30px;border-radius:15px;border:1px solid #263c5a
+}
+h1{text-align:center}
+span{color:#43d5ff}
+label{display:block;margin-top:14px}
+input{
+ width:100%;padding:13px;margin-top:7px;
+ background:#080d18;border:1px solid #30435e;
+ border-radius:7px;color:white
+}
+button{
+ width:100%;padding:15px;margin-top:20px;
+ background:#168cff;color:white;border:0;border-radius:7px
+}
+p{color:#aabbd0;text-align:center}
+a{color:#43d5ff}
+#message{color:#43d5ff}
+</style>
+</head>
+<body>
+<div class="card">
+<h1>3D <span>VISION</span></h1>
+<p>Cria a tua conta</p>
+
+<form id="registerForm">
+<label>Nome completo</label>
+<input id="name" required>
+
+<label>Email</label>
+<input id="email" type="email" required>
+
+<label>Telefone</label>
+<input id="phone" type="tel">
+
+<label>Data de nascimento</label>
+<input id="birth" type="date" required>
+
+<label>Palavra-passe</label>
+<input id="password" type="password" minlength="10" required>
+
+<label>
+<input id="confirm" type="checkbox" required style="width:auto">
+ Confirmo que tenho pelo menos 15 anos.
+</label>
+
+<button type="submit">CRIAR CONTA</button>
+</form>
+
+<p id="message"></p>
+<p>Já tens conta? <a href="login.html">Entrar</a></p>
+<p><a href="index.html">Voltar à loja</a></p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script src="auth.js"></script>
+
+<script>
+const birth=document.getElementById("birth");
+const limit=new Date();
+limit.setFullYear(limit.getFullYear()-15);
+birth.max=limit.toISOString().slice(0,10);
+
+document.getElementById("registerForm").addEventListener("submit",async e=>{
+ e.preventDefault();
+ const msg=document.getElementById("message");
+ msg.textContent="A criar conta...";
+ try{
+  await registerUser(
+   document.getElementById("name").value,
+   document.getElementById("email").value,
+   document.getElementById("phone").value,
+   birth.value,
+   document.getElementById("password").value
+  );
+  msg.textContent="Conta criada! Verifica o teu email para confirmar o registo.";
+ }catch(error){
+  msg.textContent=error.message;
+ }
+});
+</script>
+</body>
+</html>
