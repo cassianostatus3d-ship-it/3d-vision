@@ -1,0 +1,99 @@
+
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Carrinho | 3D VISION</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#080d18;color:white;font-family:Arial;padding:20px}
+main{max-width:750px;margin:40px auto}
+h1 span{color:#43d5ff}
+.item{background:#111c2e;padding:18px;margin:12px 0;border-radius:10px;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+button{padding:10px 15px;border:0;border-radius:6px;background:#168cff;color:white;cursor:pointer}
+.remove{background:#d93652}
+.total{font-size:25px;color:#43d5ff;margin:25px 0}
+a{color:#43d5ff}
+</style>
+</head>
+<body>
+<main>
+<h1>3D <span>VISION</span></h1>
+<h2>🛒 O meu carrinho</h2>
+<div id="items">A carregar...</div>
+<div class="total" id="total"></div>
+<button onclick="checkout()">CONTINUAR PARA PAGAMENTO</button>
+<p><a href="index.html">← Continuar a comprar</a></p>
+</main>
+
+<script>
+const money=n=>new Intl.NumberFormat("pt-AO").format(n)+" Kz";
+
+function getCart(){
+ try{return JSON.parse(localStorage.getItem("3dvision-cart")||"[]")}
+ catch{return []}
+}
+
+function saveCart(cart){
+ localStorage.setItem("3dvision-cart",JSON.stringify(cart));
+ render();
+}
+
+function render(){
+ const cart=getCart();
+ const items=document.getElementById("items");
+
+ if(!cart.length){
+  items.innerHTML="<p>O teu carrinho está vazio.</p>";
+  document.getElementById("total").textContent="";
+  return;
+ }
+
+ items.innerHTML=cart.map((p,i)=>`
+ <div class="item">
+ <div><strong>${escapeHTML(p.name)}</strong><br>
+ ${money(p.price)} × ${p.quantity}</div>
+ <div>
+ <button onclick="change(${i},-1)">−</button>
+ ${p.quantity}
+ <button onclick="change(${i},1)">+</button>
+ <button class="remove" onclick="removeItem(${i})">Remover</button>
+ </div>
+ </div>`).join("");
+
+ const total=cart.reduce((s,p)=>s+p.price*p.quantity,0);
+ document.getElementById("total").textContent="Total: "+money(total);
+}
+
+function escapeHTML(s){
+ return String(s).replace(/[&<>"']/g,c=>({
+ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+ }[c]));
+}
+
+function change(i,n){
+ const cart=getCart();
+ cart[i].quantity+=n;
+ if(cart[i].quantity<=0)cart.splice(i,1);
+ saveCart(cart);
+}
+
+function removeItem(i){
+ const cart=getCart();
+ cart.splice(i,1);
+ saveCart(cart);
+}
+
+function checkout(){
+ if(!getCart().length){
+  alert("O carrinho está vazio!");
+  return;
+ }
+ location.href="pagamento.html";
+}
+
+render();
+</script>
+</body>
+</html>
