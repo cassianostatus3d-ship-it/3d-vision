@@ -1,0 +1,69 @@
+
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Developer | 3D VISION</title>
+<style>
+body{margin:0;background:#080d18;color:white;font-family:Arial;padding:20px}
+main{max-width:750px;margin:40px auto}
+header,.panel{background:#111c2e;padding:25px;border-radius:12px;margin-bottom:20px}
+h1 span{color:#43d5ff}
+.row{padding:16px;border-bottom:1px solid #30435e}
+button{padding:13px 20px;background:#168cff;border:0;color:white;border-radius:7px}
+a{color:#43d5ff}
+</style>
+</head>
+<body>
+<main>
+<header>
+<h1>3D <span>VISION</span></h1>
+<p>Developer Center</p>
+</header>
+
+<div class="panel">
+<h2>Informações do sistema</h2>
+<div class="row">Aplicação: 3D VISION</div>
+<div class="row">Base de dados: Supabase</div>
+<div class="row">Versão: 1.0</div>
+<div class="row">Interface: HTML, CSS e JavaScript</div>
+<div class="row" id="status">A verificar acesso...</div>
+</div>
+
+<div class="panel">
+<h2>Ferramentas</h2>
+<p>Este painel apresenta informações técnicas. Alterações de configuração e gestão de utilizadores devem ser executadas através de serviços seguros.</p>
+<button onclick="logout()">Terminar sessão</button>
+<p><a href="index.html">Voltar à loja</a></p>
+</div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script>
+async function start(){
+ const {data:{user}}=await supabaseClient.auth.getUser();
+ if(!user){location.href="login.html";return;}
+
+ const {data,error}=await supabaseClient
+ .from("profiles").select("role").eq("id",user.id).single();
+
+ if(error||data.role!=="developer"){
+ alert("Acesso reservado ao desenvolvedor.");
+ location.href="index.html";return;
+ }
+
+ document.getElementById("status").textContent=
+ "Estado: acesso autorizado";
+}
+
+async function logout(){
+ await supabaseClient.auth.signOut();
+ location.href="login.html";
+}
+
+start();
+</script>
+</body>
+</html>
