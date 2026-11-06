@@ -1,0 +1,79 @@
+
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Entrar | 3D VISION</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;min-height:100vh;display:flex;align-items:center;
+ justify-content:center;background:#080d18;color:white;
+ font-family:Arial,sans-serif;padding:20px
+}
+.card{
+ width:100%;max-width:420px;background:#111c2e;
+ padding:32px;border-radius:16px;border:1px solid #263c5a
+}
+h1{text-align:center}
+span{color:#43d5ff}
+p{text-align:center;color:#aabbd0}
+label{display:block;margin-top:18px}
+input{
+ width:100%;padding:14px;margin-top:8px;
+ border:1px solid #30435e;background:#080d18;
+ color:white;border-radius:7px
+}
+button{
+ width:100%;padding:15px;margin-top:22px;
+ background:#168cff;color:white;border:0;
+ border-radius:7px;font-weight:bold
+}
+a{color:#43d5ff;text-decoration:none}
+#message{color:#43d5ff}
+</style>
+</head>
+<body>
+<div class="card">
+<h1>3D <span>VISION</span></h1>
+<p>Entra na tua conta</p>
+
+<form id="loginForm">
+<label>Email</label>
+<input id="email" type="email" required>
+
+<label>Palavra-passe</label>
+<input id="password" type="password" required>
+
+<button type="submit">ENTRAR</button>
+</form>
+
+<p id="message"></p>
+<p>Não tens conta? <a href="registo.html">Criar conta</a></p>
+<p><a href="index.html">Voltar à loja</a></p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script src="auth.js"></script>
+
+<script>
+document.getElementById("loginForm").addEventListener("submit",async e=>{
+ e.preventDefault();
+ const msg=document.getElementById("message");
+ msg.textContent="A verificar...";
+ try{
+  await loginUser(
+   document.getElementById("email").value,
+   document.getElementById("password").value
+  );
+  msg.textContent="Login efetuado!";
+  location.href="index.html";
+ }catch(error){
+  msg.textContent=error.message;
+ }
+});
+</script>
+</body>
+</html>
