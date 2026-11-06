@@ -1,0 +1,76 @@
+
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pagamento | 3D VISION</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#080d18;color:white;font-family:Arial;padding:20px}
+main{max-width:500px;margin:40px auto;background:#111c2e;padding:25px;border-radius:15px}
+h1 span{color:#43d5ff}
+.option{display:block;padding:18px;margin:15px 0;border:1px solid #30435e;border-radius:8px}
+input{margin-right:10px}
+button{width:100%;padding:15px;background:#168cff;color:white;border:0;border-radius:7px;margin-top:15px}
+p{color:#aabbd0;line-height:1.6}
+</style>
+</head>
+<body>
+<main>
+<h1>3D <span>VISION</span></h1>
+<h2>Finalizar compra</h2>
+<p id="total"></p>
+
+<form id="form">
+<label class="option">
+<input type="radio" name="method" value="express" required>
+MULTICAIXA Express
+</label>
+
+<label class="option">
+<input type="radio" name="method" value="unitel_money">
+Unitel Money
+</label>
+
+<label class="option">
+<input type="radio" name="method" value="paypay">
+PayPay
+</label>
+
+<button type="submit">CRIAR ENCOMENDA</button>
+</form>
+
+<p id="message"></p>
+<p>Os pagamentos reais serão ativados depois da integração com os fornecedores oficiais.</p>
+<a href="carrinho.html" style="color:#43d5ff">Voltar ao carrinho</a>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script>
+const cart=JSON.parse(localStorage.getItem("3dvision-cart")||"[]");
+const money=n=>new Intl.NumberFormat("pt-AO").format(n)+" Kz";
+
+document.getElementById("total").textContent=
+ "Total: "+money(cart.reduce((s,p)=>s+p.price*p.quantity,0));
+
+document.getElementById("form").addEventListener("submit",async e=>{
+ e.preventDefault();
+ const msg=document.getElementById("message");
+
+ try{
+  const {data:{user},error}=await supabaseClient.auth.getUser();
+  if(error)throw error;
+  if(!user){
+   location.href="login.html";
+   return;
+  }
+  msg.textContent="Sessão confirmada. A criação segura da encomenda e a integração do pagamento ainda precisam de ser configuradas no servidor.";
+ }catch(error){
+  msg.textContent=error.message;
+ }
+});
+</script>
+</body>
+</html>
